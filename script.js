@@ -15,8 +15,9 @@ const CANVAS_HEIGHT = 1080;
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 
-// Create background objects
 let gameSpeed = 5;
+
+// Background layers
 const backGroundLayer1 = new Image();
 backGroundLayer1.src = "layer_01.png";
 const backGroundLayer2 = new Image();
@@ -27,6 +28,48 @@ const backGroundLayer4 = new Image();
 backGroundLayer4.src = "layer_04.png";
 const backGroundLayer5 = new Image();
 backGroundLayer5.src = "layer_05.png";
+
+// Create background layers objects
+class Layer {
+	constructor(image, speedModifier) {
+		this.x = 0;
+		this.y = 0;
+		this.width = 2048;
+		this.height = CANVAS_HEIGHT;
+		this.x2 = this.width;
+		this.image = image;
+		this.speedModifier = speedModifier;
+		this.speed = gameSpeed * this.speedModifier;
+	}
+	update() {
+		this.speed = gameSpeed * this.speedModifier;
+
+		// If the layer is completely offscreen, reset its position
+		// to the end of the other layer
+		if (this.x <= -this.width) {
+			this.x = this.width + this.x2 - this.speed;
+		}
+
+		if (this.x2 <= -this.width) {
+			this.x2 = this.width + this.x - this.speed;
+		}
+
+		this.x = Math.floor(this.x - this.speed);
+		this.x2 = Math.floor(this.x2 - this.speed);
+	}
+	draw() {
+		ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+		ctx.drawImage(this.image, this.x2, this.y, this.width, this.height);
+	}
+}
+
+const layer1 = new Layer(backGroundLayer1, 0.2);
+const layer2 = new Layer(backGroundLayer2, 0.4);
+const layer3 = new Layer(backGroundLayer3, 0.6);
+const layer4 = new Layer(backGroundLayer4, 0.8);
+const layer5 = new Layer(backGroundLayer5, 1);
+
+const backgroundLayers = [layer1, layer2, layer3, layer4, layer5];
 
 // Create player objects
 
@@ -66,11 +109,10 @@ function animate() {
 	ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
 	// Draw background layers
-	ctx.drawImage(backGroundLayer1, 0, 0);
-	ctx.drawImage(backGroundLayer2, 0, 0);
-	ctx.drawImage(backGroundLayer3, 0, 0);
-	ctx.drawImage(backGroundLayer4, 0, 0);
-	ctx.drawImage(backGroundLayer5, 0, 0);
+	backgroundLayers.forEach((layer) => {
+		layer.update();
+		layer.draw();
+	});
 
 	// Draw player
 	let position = Math.floor(
@@ -79,7 +121,7 @@ function animate() {
 	let frameX = position * spriteWidth;
 	let frameY = spriteAnimation[playerState].loc[position].y;
 	ctx.drawImage(
-		playerImage,
+		playerImg,
 		frameX,
 		frameY,
 		spriteWidth,
