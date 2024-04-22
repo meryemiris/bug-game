@@ -1,36 +1,41 @@
-#canvas {
-  border: 2px solid #000;
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eee;
+}
+
+#container {
+  display: grid;
+  flex-direction: column;
   background-color: #fff;
   width: 1000px;
-  height: 700px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 0;
-
+  padding: 20px;
 
 
 }
 
-#animations {
+#animationSelect {
+  justify-self: flex-end;
 
-  position: absolute;
-  right: 25%;
+}
+
+#animations {
   font-size: large;
   padding: 2px 5px;
   border: 1px solid #000;
   border-radius: 5px;
   cursor: pointer;
-  z-index: 10;
 }
 
 
+#canvas {
+  position: relative;
+  width: 1000px;
+  z-index: 0;
+  margin: 5px 0;
+}
 
-
-
-
-
-body {
-  background-color: #eee;
+#slider {
+  width: 100%;
 }

@@ -9,20 +9,24 @@
 </head>
 
 <body>
-  <div class="controls">
+  <div id="container">
+    <div id="animationSelect">
+      <select id="animations" name="animations">
+        <option value="idle">Idle</option>
+        <option value="run">Run</option>
+        <option value="jump">Jump</option>
+        <option value="fall">Fall</option>
+        <option value="dizzy">Dizzy</option>
+        <option value="gethit">Get Hit</option>
+        <option value="attack">Attack</option>
 
-    <select id="animations" name="animations">
-      <option value="idle">Idle</option>
-      <option value="run">Run</option>
-      <option value="jump">Jump</option>
-      <option value="fall">Fall</option>
-      <option value="dizzy">Dizzy</option>
-      <option value="gethit">Get Hit</option>
-      <option value="attack">Attack</option>
+      </select>
+    </div>
+    <canvas id="canvas" width="600" height="600"></canvas>
 
-    </select>
+    <input type="range" min="0" max="20" value="5" id="speed">
+
   </div>
-  <canvas id="canvas" width="600" height="600"></canvas>
 
   <script src="script.js"></script>
 
