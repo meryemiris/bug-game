@@ -10,11 +10,9 @@ const ctx = canvas.getContext("2d");
 
 const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
+
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
-
-let canvasPosition = canvas.getBoundingClientRect();
-console.log(canvasPosition);
 
 let gameSpeed = 5;
 const numberOfEnemies = 3;
@@ -209,10 +207,10 @@ window.addEventListener("load", () => {
 		constructor(x, y) {
 			this.spriteWidth = 200;
 			this.spriteHeight = 179;
-			this.width = this.spriteWidth / 2;
-			this.height = this.spriteWidth / 2;
-			this.x = x;
-			this.y = y;
+			this.width = this.spriteWidth * 0.7;
+			this.height = this.spriteHeight * 0.7;
+			this.x = x - this.width / 2;
+			this.y = y - this.height / 2;
 			this.image = new Image();
 			this.image.src = "./assets/boom.png";
 			this.timer = 0;
@@ -238,15 +236,22 @@ window.addEventListener("load", () => {
 			);
 		}
 	}
+
 	// add event listener for boom
 	window.addEventListener("click", (e) => {
-		let positionX = e.x - canvasPosition.x;
-		let positionY = e.y - canvasPosition.y;
+		boomEffect(e);
+	});
 
-		console.log(positionX, positionY);
+	function boomEffect(e) {
+		const rect = canvas.getBoundingClientRect();
+		const scaleX = canvas.width / rect.width;
+		const scaleY = canvas.height / rect.height;
+
+		let positionX = (e.clientX - rect.left) * scaleX;
+		let positionY = (e.clientY - rect.top) * scaleY;
 
 		explosions.push(new Explosion(positionX, positionY));
-	});
+	}
 
 	// Animation loop
 	function animate() {
