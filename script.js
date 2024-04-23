@@ -13,7 +13,10 @@ const CANVAS_HEIGHT = 1080;
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 
-let gameSpeed = 0;
+let canvasPosition = canvas.getBoundingClientRect();
+console.log(canvasPosition);
+
+let gameSpeed = 5;
 const numberOfEnemies = 3;
 const enemiesArray = []; // Array to store enemy objects
 
@@ -44,7 +47,7 @@ window.addEventListener("load", () => {
 			this.x = 0;
 			this.y = 0;
 			this.width = 2048;
-			this.height = CANVAS_HEIGHT;
+			this.height = 1080;
 			this.image = image;
 			this.speedModifier = speedModifier;
 			this.speed = gameSpeed * this.speedModifier;
@@ -80,7 +83,7 @@ window.addEventListener("load", () => {
 		constructor() {
 			this.enemyWidth = 136.5;
 			this.enemyHeight = 141;
-			this.speed = Math.random() * 5 + 1;
+			this.speed = 0; // stop animation
 			this.width = this.enemyWidth;
 			this.height = this.enemyHeight;
 			this.x = Math.random() * (canvas.width - this.width);
@@ -132,13 +135,13 @@ window.addEventListener("load", () => {
 		constructor() {
 			this.x = 1920;
 			this.y = 600;
-			this.speed = 2;
+			this.speed = 0; // stop
 			this.monsterWidth = 262;
 			this.monsterHeight = 242;
 			this.width = this.monsterWidth * 1.5;
 			this.height = this.monsterHeight * 1.5;
 			this.frame = 0;
-			this.walkSpeed = Math.floor(Math.random() * 3 + 1);
+			this.walkSpeed = 0;
 		}
 		update() {
 			this.x -= this.speed;
@@ -199,6 +202,52 @@ window.addEventListener("load", () => {
 		spriteAnimation[state.name] = frames;
 	});
 
+	// create explosion
+	let explosions = [];
+
+	class Explosion {
+		constructor(x, y) {
+			this.spriteWidth = 200;
+			this.spriteHeight = 179;
+			this.width = this.spriteWidth / 2;
+			this.height = this.spriteWidth / 2;
+			this.x = x;
+			this.y = y;
+			this.image = new Image();
+			this.image.src = "./assets/boom.png";
+			this.timer = 0;
+			this.frame = 0;
+		}
+		update() {
+			this.timer++;
+			if (this.timer % 10 === 0) {
+				this.frame++;
+			}
+		}
+		draw() {
+			ctx.drawImage(
+				this.image,
+				this.spriteWidth * this.frame,
+				0,
+				this.spriteWidth,
+				this.spriteHeight,
+				this.x,
+				this.y,
+				this.width,
+				this.height
+			);
+		}
+	}
+	// add event listener for boom
+	window.addEventListener("click", (e) => {
+		let positionX = e.x - canvasPosition.x;
+		let positionY = e.y - canvasPosition.y;
+
+		console.log(positionX, positionY);
+
+		explosions.push(new Explosion(positionX, positionY));
+	});
+
 	// Animation loop
 	function animate() {
 		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -230,6 +279,7 @@ window.addEventListener("load", () => {
 			if (frameX < 6) frameX++;
 			else frameX = 0;
 		}
+		gameFrame++;
 
 		// Update and Draw enemies
 		enemiesArray.forEach((enemy) => {
@@ -241,8 +291,18 @@ window.addEventListener("load", () => {
 		monster.update();
 		monster.draw();
 
+		//animate explosion
+
+		for (let i = 0; i < explosions.length; i++) {
+			explosions[i].update();
+			explosions[i].draw();
+			if (explosions[i].frame > 5) {
+				explosions.splice(i, 1);
+				i--;
+			}
+		}
+
 		// Update game state
-		gameFrame++;
 		requestAnimationFrame(animate);
 	}
 
