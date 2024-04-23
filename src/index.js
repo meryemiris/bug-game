@@ -28,15 +28,15 @@ slider.addEventListener("change", (e) => {
 // Load background images
 
 const backGroundLayer1 = new Image();
-backGroundLayer1.src = "./assets/layer_01.png";
+backGroundLayer1.src = "./src/assets/layer_01.png";
 const backGroundLayer2 = new Image();
-backGroundLayer2.src = "./assets/layer_02.png";
+backGroundLayer2.src = "./src/assets/layer_02.png";
 const backGroundLayer3 = new Image();
-backGroundLayer3.src = "./assets/layer_03.png";
+backGroundLayer3.src = "./src/assets/layer_03.png";
 const backGroundLayer4 = new Image();
-backGroundLayer4.src = "./assets/layer_04.png";
+backGroundLayer4.src = "./src/assets/layer_04.png";
 const backGroundLayer5 = new Image();
-backGroundLayer5.src = "./assets/layer_05.png";
+backGroundLayer5.src = "./src/assets/layer_05.png";
 
 // Wait for images to load before starting the game
 window.addEventListener("load", () => {
@@ -76,7 +76,7 @@ window.addEventListener("load", () => {
 
 	// Create Enemies
 	const enemyImg = new Image();
-	enemyImg.src = "./assets/enemy.png";
+	enemyImg.src = "./src/assets/enemy.png";
 	class Enemy {
 		constructor() {
 			this.enemyWidth = 136.5;
@@ -127,7 +127,7 @@ window.addEventListener("load", () => {
 
 	// Create Monster
 	const monsterImg = new Image();
-	monsterImg.src = "./assets/monster.png";
+	monsterImg.src = "./src/assets/monster.png";
 
 	class Monster {
 		constructor() {
@@ -171,7 +171,7 @@ window.addEventListener("load", () => {
 	// Create Player
 
 	const playerImg = new Image();
-	playerImg.src = "./assets/player.png";
+	playerImg.src = "./src/assets/player.png";
 
 	const spriteWidth = 330;
 	const spriteHeight = 221;
@@ -212,11 +212,11 @@ window.addEventListener("load", () => {
 			this.x = x - this.width / 2;
 			this.y = y - this.height / 2;
 			this.image = new Image();
-			this.image.src = "./assets/boom.png";
+			this.image.src = "./src/assets/boom.png";
 			this.timer = 0;
 			this.frame = 0;
 			this.sound = new Audio();
-			this.sound.src = "./assets/boom.wav";
+			this.sound.src = "./src/assets/boom.wav";
 		}
 		update() {
 			if (this.frame === 0) this.sound.play();
