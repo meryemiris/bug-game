@@ -96,8 +96,7 @@ window.addEventListener("load", () => {
 				this.frame >= 12 ? (this.frame = 0) : this.frame++;
 			}
 		}
-		draw(color) {
-			ctx.fillStyle = this.color = color;
+		draw() {
 			ctx.drawImage(
 				enemyImg,
 				this.frame * this.enemyWidth,
@@ -117,11 +116,10 @@ window.addEventListener("load", () => {
 	}
 
 	// Create Monster
-	const monsterImg = new Image();
-	monsterImg.src = "./src/assets/monster.png";
-
 	class Monster {
 		constructor() {
+			this.image = new Image();
+			this.image.src = "./src/assets/monster.png";
 			this.x = 1920;
 			this.y = 600;
 			this.speed = 2;
@@ -129,23 +127,21 @@ window.addEventListener("load", () => {
 			this.monsterHeight = 242;
 			this.width = this.monsterWidth * 1.5;
 			this.height = this.monsterHeight * 1.5;
-			this.frame = 0;
+			this.frameX = 0;
 			this.walkSpeed = 2;
 		}
 		update() {
 			this.x -= this.speed;
 			if (this.x < -500) this.x = 1920;
 
-			// Animate monsters
 			if (gameFrame % this.walkSpeed === 0) {
-				this.frame >= 12 ? (this.frame = 0) : this.frame++;
+				this.frameX >= 12 ? (this.frameX = 0) : this.frameX++;
 			}
 		}
-		draw(color) {
-			ctx.fillStyle = this.color = color;
+		draw() {
 			ctx.drawImage(
-				monsterImg,
-				this.frame * this.monsterWidth,
+				this.image,
+				this.frameX * this.monsterWidth,
 				484,
 				this.monsterWidth,
 				this.monsterHeight,
@@ -226,8 +222,6 @@ window.addEventListener("load", () => {
 			layer.draw();
 		});
 
-		gameFrame++;
-
 		const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
 		player.update(input.lastKey);
 		player.draw(ctx);
@@ -254,6 +248,7 @@ window.addEventListener("load", () => {
 				i--;
 			}
 		}
+		gameFrame++;
 
 		// Update game state
 		requestAnimationFrame(animate);

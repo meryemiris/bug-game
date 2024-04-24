@@ -15,8 +15,8 @@ export default class Player {
 		this.x = this.gameWidth / 2 - this.width / 2;
 		this.y = this.gameHeight - this.height - 160;
 		this.speed = 10;
-		this.frameX = 4;
-		this.frameY = 11;
+		this.frameX = 0;
+		this.frameY = 2;
 	}
 	draw(context) {
 		context.drawImage(
