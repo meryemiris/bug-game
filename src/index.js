@@ -1,9 +1,6 @@
-// Set up player state and dropdown menu
-let playerState = "idle";
-const dropdown = document.getElementById("animations");
-dropdown.addEventListener("change", (e) => {
-	playerState = e.target.value;
-});
+import Player from "./components/player.js";
+import InputHandler from "./components/input.js";
+import { drawStatusText } from "./components/utils.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -15,15 +12,9 @@ canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 
 let gameSpeed = 5;
+let gameFrame = 0;
 const numberOfEnemies = 3;
 const enemiesArray = []; // Array to store enemy objects
-
-// Set up speed slider
-const slider = document.getElementById("speed");
-slider.value = gameSpeed;
-slider.addEventListener("change", (e) => {
-	gameSpeed = e.target.value;
-});
 
 // Load background images
 
@@ -81,7 +72,7 @@ window.addEventListener("load", () => {
 		constructor() {
 			this.enemyWidth = 136.5;
 			this.enemyHeight = 141;
-			this.speed = 0; // stop animation
+			this.speed = 2; // stop animation
 			this.width = this.enemyWidth;
 			this.height = this.enemyHeight;
 			this.x = Math.random() * (canvas.width - this.width);
@@ -133,13 +124,13 @@ window.addEventListener("load", () => {
 		constructor() {
 			this.x = 1920;
 			this.y = 600;
-			this.speed = 0; // stop
+			this.speed = 2;
 			this.monsterWidth = 262;
 			this.monsterHeight = 242;
 			this.width = this.monsterWidth * 1.5;
 			this.height = this.monsterHeight * 1.5;
 			this.frame = 0;
-			this.walkSpeed = 0;
+			this.walkSpeed = 2;
 		}
 		update() {
 			this.x -= this.speed;
@@ -167,38 +158,6 @@ window.addEventListener("load", () => {
 	}
 
 	const monster = new Monster();
-
-	// Create Player
-
-	const playerImg = new Image();
-	playerImg.src = "./src/assets/player.png";
-
-	const spriteWidth = 330;
-	const spriteHeight = 221;
-	let gameFrame = 0;
-	const staggerFrames = 5;
-
-	const spriteAnimation = [];
-	const animationStates = [
-		{ name: "idle", frames: 7 },
-		{ name: "run", frames: 13 },
-		{ name: "jump", frames: 11 },
-		{ name: "fall", frames: 11 },
-		{ name: "dizzy", frames: 21 },
-		{ name: "gethit", frames: 11 },
-		{ name: "attack", frames: 16 },
-	];
-
-	animationStates.forEach((state, index) => {
-		let frames = { loc: [] };
-		for (let i = 0; i < state.frames; i++) {
-			let positionX = i * spriteWidth;
-			let positionY = index * spriteHeight;
-
-			frames.loc.push({ x: positionX, y: positionY });
-		}
-		spriteAnimation[state.name] = frames;
-	});
 
 	// create explosion
 	let explosions = [];
@@ -255,6 +214,7 @@ window.addEventListener("load", () => {
 
 		explosions.push(new Explosion(positionX, positionY));
 	}
+	const input = new InputHandler();
 
 	// Animation loop
 	function animate() {
@@ -266,28 +226,13 @@ window.addEventListener("load", () => {
 			layer.draw();
 		});
 
-		// Update and Draw player
-		let position = Math.floor(
-			(gameFrame / staggerFrames) % spriteAnimation[playerState].loc.length
-		);
-		let frameX = position * spriteWidth;
-		let frameY = spriteAnimation[playerState].loc[position].y;
-		ctx.drawImage(
-			playerImg,
-			frameX,
-			frameY,
-			spriteWidth,
-			spriteHeight,
-			0,
-			700,
-			spriteWidth,
-			spriteHeight
-		);
-		if (gameFrame % staggerFrames === 0) {
-			if (frameX < 6) frameX++;
-			else frameX = 0;
-		}
 		gameFrame++;
+
+		const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
+		player.update(input.lastKey);
+		player.draw(ctx);
+
+		drawStatusText(ctx, input, player);
 
 		// Update and Draw enemies
 		enemiesArray.forEach((enemy) => {

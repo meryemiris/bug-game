@@ -1,41 +1,27 @@
 body {
   height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   background-color: #eee;
+
 }
 
 #container {
   display: grid;
   background-color: #fff;
-  width: 1000px;
+  max-width: 1000px;
+  width: calc(90vw - 20px);
   padding: 20px;
 
 
 }
 
-#animationSelect {
-  justify-self: flex-end;
 
-}
-
-#animations {
-  font-size: large;
-  padding: 2px 5px;
-  border: 1px solid #000;
-  border-radius: 5px;
-  cursor: pointer;
-}
 
 
 #canvas {
   position: relative;
-  width: 1000px;
-  z-index: 0;
-  margin: 5px 0;
-}
-
-#slider {
   width: 100%;
+  z-index: 0;
 }
