@@ -12,10 +12,7 @@ body {
   display: grid;
   background-color: #fff;
   max-width: 1000px;
-  width: calc(90vw - 20px);
-  padding: 20px;
-
-
+  width: 100vw;
 }
 
 #canvas {

@@ -39,7 +39,7 @@ window.addEventListener("load", () => {
 			this.height = 1080;
 			this.image = image;
 			this.speedModifier = speedModifier;
-			this.speed = gameSpeed * this.speedModifier;
+			this.speed = 0;
 		}
 		update() {
 			this.speed = gameSpeed * this.speedModifier;
@@ -120,7 +120,7 @@ window.addEventListener("load", () => {
 		constructor() {
 			this.image = new Image();
 			this.image.src = "./src/assets/monster.png";
-			this.x = 1920;
+			this.x = 1200;
 			this.y = 600;
 			this.speed = 2;
 			this.monsterWidth = 262;
@@ -128,7 +128,7 @@ window.addEventListener("load", () => {
 			this.width = this.monsterWidth * 1.5;
 			this.height = this.monsterHeight * 1.5;
 			this.frameX = 0;
-			this.walkSpeed = 2;
+			this.walkSpeed = 10;
 		}
 		update() {
 			this.x -= this.speed;

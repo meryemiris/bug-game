@@ -1,10 +1,24 @@
-import { StandingLeft, StandingRight } from "./state.js";
+import {
+	StandingRight,
+	StandingLeft,
+	RunningRight,
+	RunningLeft,
+	JumpingRight,
+	JumpingLeft,
+} from "./state.js";
 
 export default class Player {
 	constructor(gameWidth, gameHeight) {
 		this.gameWidth = gameWidth;
 		this.gameHeight = gameHeight;
-		this.states = [new StandingLeft(this), new StandingRight(this)];
+		this.states = [
+			new StandingRight(this),
+			new StandingLeft(this),
+			new RunningRight(this),
+			new RunningLeft(this),
+			new JumpingRight(this),
+			new JumpingLeft(this),
+		];
 		this.currentState = this.states[0];
 		this.image = new Image();
 		this.image.src = "./src/assets/player.png";
