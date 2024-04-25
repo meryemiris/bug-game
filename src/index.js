@@ -210,10 +210,18 @@ window.addEventListener("load", () => {
 
 		explosions.push(new Explosion(positionX, positionY));
 	}
+
+	const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
+	player.draw(ctx);
+
 	const input = new InputHandler();
 
+	let lastTime = 0;
+
 	// Animation loop
-	function animate() {
+	function animate(timeStamp) {
+		const deltaTime = timeStamp - lastTime;
+		lastTime = timeStamp;
 		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
 		// Draw background layers
@@ -222,9 +230,8 @@ window.addEventListener("load", () => {
 			layer.draw();
 		});
 
-		const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
 		player.update(input.lastKey);
-		player.draw(ctx);
+		player.draw(ctx, deltaTime);
 
 		drawStatusText(ctx, input, player);
 
@@ -254,5 +261,5 @@ window.addEventListener("load", () => {
 		requestAnimationFrame(animate);
 	}
 
-	animate();
+	animate(0);
 });
