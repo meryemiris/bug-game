@@ -1,9 +1,9 @@
 export default class Layer {
-	constructor(image, speedModifier) {
+	constructor(image, speedModifier, gameWidth, gameHeight) {
 		this.x = 0;
 		this.y = 0;
-		this.width = 2048;
-		this.height = 1080;
+		this.width = gameWidth;
+		this.height = gameHeight;
 		this.image = image;
 		this.speedModifier = speedModifier;
 		this.speed = 0;

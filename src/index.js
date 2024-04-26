@@ -10,11 +10,17 @@ import { drawStatusText } from "./components/player/utils.js";
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-const CANVAS_WIDTH = 2048;
+const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
 
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
+
+const collisionCanvas = document.getElementById("collision");
+const collisionCtx = collisionCanvas.getContext("2d");
+
+collisionCanvas.width = CANVAS_WIDTH;
+collisionCanvas.height = CANVAS_HEIGHT;
 
 let gameSpeed = 10;
 let gameFrame = 0;
@@ -62,8 +68,10 @@ window.addEventListener("load", () => {
 	function createEnemies(numberOfEnemies) {
 		for (let i = 0; i < numberOfEnemies; i++) {
 			enemiesArray.push(new Enemy(CANVAS_WIDTH, CANVAS_HEIGHT));
-			enemiesArray[i].draw(ctx);
+			enemiesArray[i].draw(collisionCtx, ctx);
 		}
+		//put smaller enemies backword
+		enemiesArray.sort((a, b) => a.width - b.width); //sort as smaller are backward
 	}
 	createEnemies(numberOfEnemies);
 
@@ -89,6 +97,7 @@ window.addEventListener("load", () => {
 		const deltaTime = timeStamp - lastTime;
 		lastTime = timeStamp;
 		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+		collisionCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); // clear collision canvas
 
 		// Update Draw background layers
 		backgroundLayers.forEach((layer) => {
@@ -107,7 +116,7 @@ window.addEventListener("load", () => {
 		// Update and Draw enemies
 		enemiesArray.forEach((enemy) => {
 			enemy.update(gameFrame);
-			enemy.draw(ctx);
+			enemy.draw(collisionCtx, ctx);
 		});
 
 		// Draw text

@@ -5,8 +5,10 @@ export default class Enemy {
 		this.enemyWidth = 136.5;
 		this.enemyHeight = 141;
 		this.speed = 2;
-		this.width = this.enemyWidth;
-		this.height = this.enemyHeight;
+		this.sizeModifier = 1 + Math.random() * 0.5;
+
+		this.width = this.enemyWidth * this.sizeModifier;
+		this.height = this.enemyHeight * this.sizeModifier;
 		this.x = Math.random() * (gameWidth - this.width);
 		this.y = Math.random() * (gameHeight - this.height);
 		this.angle = Math.random() * 5 * Math.PI;
@@ -14,6 +16,22 @@ export default class Enemy {
 
 		this.frame = 0;
 		this.flapSpeed = Math.floor(Math.random() * 5 + 1);
+
+		this.randomColors = [
+			Math.floor(Math.random() * 255),
+			Math.floor(Math.random() * 255),
+			Math.floor(Math.random() * 255),
+		];
+		this.color =
+			"rgb(" +
+			this.randomColors[0] +
+			"," +
+			this.randomColors[1] +
+			"," +
+			this.randomColors[2] +
+			")";
+
+		console.log(this.color);
 	}
 	update(gameFrame) {
 		this.x -= this.speed;
@@ -28,7 +46,13 @@ export default class Enemy {
 			this.frame >= 12 ? (this.frame = 0) : this.frame++;
 		}
 	}
-	draw(context) {
+	draw(collisionCtx, context) {
+		// Draw collision box
+		collisionCtx.fillStyle = this.color;
+		collisionCtx.fillRect(this.x, this.y, this.width, this.height, this.color);
+
+		// Draw enemy
+
 		context.drawImage(
 			this.enemyImg,
 			this.frame * this.enemyWidth,

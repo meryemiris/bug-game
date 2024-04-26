@@ -7,7 +7,7 @@ export default class Monster {
 		this.image = new Image();
 		this.image.src = "./src/assets/monster.png";
 
-		this.speed = 2;
+		this.speed = 0;
 		this.monsterWidth = 262;
 		this.monsterHeight = 242;
 		this.width = this.monsterWidth * 1.5;
