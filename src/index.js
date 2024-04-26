@@ -1,6 +1,7 @@
 import Player from "./components/player/player.js";
 import Layer from "./components/background/background.js";
 import Enemy from "./components/enemy/enemy.js";
+import Monster from "./components/monster/monster.js";
 import InputHandler from "./components/player/input.js";
 import { drawStatusText } from "./components/player/utils.js";
 
@@ -50,44 +51,8 @@ window.addEventListener("load", () => {
 	createEnemies(numberOfEnemies);
 
 	// Create Monster
-	class Monster {
-		constructor() {
-			this.image = new Image();
-			this.image.src = "./src/assets/monster.png";
-			this.x = 1200;
-			this.y = 600;
-			this.speed = 2;
-			this.monsterWidth = 262;
-			this.monsterHeight = 242;
-			this.width = this.monsterWidth * 1.5;
-			this.height = this.monsterHeight * 1.5;
-			this.frameX = 0;
-			this.walkSpeed = 10;
-		}
-		update() {
-			this.x -= this.speed;
-			if (this.x < -500) this.x = 1920;
 
-			if (gameFrame % this.walkSpeed === 0) {
-				this.frameX >= 12 ? (this.frameX = 0) : this.frameX++;
-			}
-		}
-		draw() {
-			ctx.drawImage(
-				this.image,
-				this.frameX * this.monsterWidth,
-				484,
-				this.monsterWidth,
-				this.monsterHeight,
-				this.x,
-				this.y,
-				this.width,
-				this.height
-			);
-		}
-	}
-
-	const monster = new Monster();
+	const monster = new Monster(CANVAS_WIDTH, CANVAS_HEIGHT);
 
 	// create explosion
 	let explosions = [];
@@ -169,8 +134,8 @@ window.addEventListener("load", () => {
 		player.draw(ctx, deltaTime);
 
 		// Update and Draw monster
-		monster.update();
-		monster.draw();
+		monster.update(gameFrame);
+		monster.draw(ctx);
 
 		// Update and Draw enemies
 		enemiesArray.forEach((enemy) => {

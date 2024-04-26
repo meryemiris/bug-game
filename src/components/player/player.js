@@ -30,7 +30,7 @@ export default class Player {
 		this.spriteHeight = 330;
 		this.width = this.spriteWidth;
 		this.height = this.spriteHeight;
-		this.x = this.gameWidth / 2 - this.width / 2;
+		this.x = -this.gameWidth;
 		this.y = this.gameHeight - this.height - 160;
 		// this.velX = 0;
 		this.velY = 0;
