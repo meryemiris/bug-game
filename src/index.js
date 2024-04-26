@@ -2,6 +2,8 @@ import Player from "./components/player/player.js";
 import Layer from "./components/background/background.js";
 import Enemy from "./components/enemy/enemy.js";
 import Monster from "./components/monster/monster.js";
+import Explosion from "./components/explosion/explosion.js";
+
 import InputHandler from "./components/player/input.js";
 import { drawStatusText } from "./components/player/utils.js";
 
@@ -17,89 +19,57 @@ canvas.height = CANVAS_HEIGHT;
 let gameSpeed = 10;
 let gameFrame = 0;
 
-// Load background images
+let lastTime = 0;
 
-const backGroundLayer1 = new Image();
-backGroundLayer1.src = "./src/assets/layer_01.png";
-const backGroundLayer2 = new Image();
-backGroundLayer2.src = "./src/assets/layer_02.png";
-const backGroundLayer3 = new Image();
-backGroundLayer3.src = "./src/assets/layer_03.png";
-const backGroundLayer4 = new Image();
-backGroundLayer4.src = "./src/assets/layer_04.png";
-const backGroundLayer5 = new Image();
-backGroundLayer5.src = "./src/assets/layer_05.png";
+const numberOfEnemies = 5;
+let enemiesArray = [];
 
-const layer1 = new Layer(backGroundLayer1, 0.2);
-const layer2 = new Layer(backGroundLayer2, 0.4);
-const layer3 = new Layer(backGroundLayer3, 0.6);
-const layer4 = new Layer(backGroundLayer4, 0.8);
-const layer5 = new Layer(backGroundLayer5, 1);
+let explosions = [];
 
-const backgroundLayers = [layer1, layer2, layer3, layer4, layer5];
-
-// Wait for images to load before starting the game
 window.addEventListener("load", () => {
+	// Create player
+	const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
+	player.draw(ctx);
+
+	// Create input handler for player
+	const input = new InputHandler();
+
+	// Create background
+	const backGroundLayer1 = new Image();
+	backGroundLayer1.src = "./src/assets/layer_01.png";
+	const backGroundLayer2 = new Image();
+	backGroundLayer2.src = "./src/assets/layer_02.png";
+	const backGroundLayer3 = new Image();
+	backGroundLayer3.src = "./src/assets/layer_03.png";
+	const backGroundLayer4 = new Image();
+	backGroundLayer4.src = "./src/assets/layer_04.png";
+	const backGroundLayer5 = new Image();
+	backGroundLayer5.src = "./src/assets/layer_05.png";
+
+	const layer1 = new Layer(backGroundLayer1, 0.2);
+	const layer2 = new Layer(backGroundLayer2, 0.4);
+	const layer3 = new Layer(backGroundLayer3, 0.6);
+	const layer4 = new Layer(backGroundLayer4, 0.8);
+	const layer5 = new Layer(backGroundLayer5, 1);
+
+	const backgroundLayers = [layer1, layer2, layer3, layer4, layer5];
+
+	// Create Monster
+	const monster = new Monster(CANVAS_WIDTH, CANVAS_HEIGHT);
+	monster.draw(ctx);
+
 	// Create Enemies
-	const numberOfEnemies = 3;
-	const enemiesArray = [];
 	function createEnemies(numberOfEnemies) {
 		for (let i = 0; i < numberOfEnemies; i++) {
 			enemiesArray.push(new Enemy(CANVAS_WIDTH, CANVAS_HEIGHT));
+			enemiesArray[i].draw(ctx);
 		}
 	}
 	createEnemies(numberOfEnemies);
 
-	// Create Monster
-
-	const monster = new Monster(CANVAS_WIDTH, CANVAS_HEIGHT);
-
 	// create explosion
-	let explosions = [];
 
-	class Explosion {
-		constructor(x, y) {
-			this.spriteWidth = 200;
-			this.spriteHeight = 179;
-			this.width = this.spriteWidth * 0.7;
-			this.height = this.spriteHeight * 0.7;
-			this.x = x - this.width / 2;
-			this.y = y - this.height / 2;
-			this.image = new Image();
-			this.image.src = "./src/assets/boom.png";
-			this.timer = 0;
-			this.frame = 0;
-			this.sound = new Audio();
-			this.sound.src = "./src/assets/boom.wav";
-		}
-		update() {
-			// if (this.frame === 0) this.sound.play();
-			this.timer++;
-			if (this.timer % 10 === 0) {
-				this.frame++;
-			}
-		}
-		draw() {
-			ctx.drawImage(
-				this.image,
-				this.spriteWidth * this.frame,
-				0,
-				this.spriteWidth,
-				this.spriteHeight,
-				this.x,
-				this.y,
-				this.width,
-				this.height
-			);
-		}
-	}
-
-	// add event listener for boom
-	window.addEventListener("click", (e) => {
-		boomEffect(e);
-	});
-
-	function boomEffect(e) {
+	function createExplosion(e) {
 		const rect = canvas.getBoundingClientRect();
 		const scaleX = canvas.width / rect.width;
 		const scaleY = canvas.height / rect.height;
@@ -110,12 +80,9 @@ window.addEventListener("load", () => {
 		explosions.push(new Explosion(positionX, positionY));
 	}
 
-	const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
-	player.draw(ctx);
-
-	const input = new InputHandler();
-
-	let lastTime = 0;
+	window.addEventListener("click", (e) => {
+		createExplosion(e);
+	});
 
 	// Animation loop
 	function animate(timeStamp) {
@@ -123,7 +90,7 @@ window.addEventListener("load", () => {
 		lastTime = timeStamp;
 		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-		// Draw background layers
+		// Update Draw background layers
 		backgroundLayers.forEach((layer) => {
 			layer.update(gameSpeed);
 			layer.draw(ctx);
@@ -143,14 +110,14 @@ window.addEventListener("load", () => {
 			enemy.draw(ctx);
 		});
 
-		// draw text
+		// Draw text
 		drawStatusText(ctx, input, player);
 
-		//animate explosion
+		// Animate explosion
 
 		for (let i = 0; i < explosions.length; i++) {
 			explosions[i].update();
-			explosions[i].draw();
+			explosions[i].draw(ctx);
 			if (explosions[i].frame > 5) {
 				explosions.splice(i, 1);
 				i--;
