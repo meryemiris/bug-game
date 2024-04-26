@@ -1,20 +1,20 @@
-import Player from "./components/player.js";
-import InputHandler from "./components/input.js";
-import { drawStatusText } from "./components/utils.js";
+import Player from "./components/player/player.js";
+import Layer from "./components/background/background.js";
+import Enemy from "./components/enemies/enemies.js";
+import InputHandler from "./components/player/input.js";
+import { drawStatusText } from "./components/player/utils.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-const CANVAS_WIDTH = 1920;
+const CANVAS_WIDTH = 2048;
 const CANVAS_HEIGHT = 1080;
 
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 
-let gameSpeed = 5;
+let gameSpeed = 10;
 let gameFrame = 0;
-const numberOfEnemies = 3;
-const enemiesArray = []; // Array to store enemy objects
 
 // Load background images
 
@@ -29,91 +29,25 @@ backGroundLayer4.src = "./src/assets/layer_04.png";
 const backGroundLayer5 = new Image();
 backGroundLayer5.src = "./src/assets/layer_05.png";
 
+const layer1 = new Layer(backGroundLayer1, 0.2);
+const layer2 = new Layer(backGroundLayer2, 0.4);
+const layer3 = new Layer(backGroundLayer3, 0.6);
+const layer4 = new Layer(backGroundLayer4, 0.8);
+const layer5 = new Layer(backGroundLayer5, 1);
+
+const backgroundLayers = [layer1, layer2, layer3, layer4, layer5];
+
 // Wait for images to load before starting the game
 window.addEventListener("load", () => {
-	class Layer {
-		constructor(image, speedModifier) {
-			this.x = 0;
-			this.y = 0;
-			this.width = 2048;
-			this.height = 1080;
-			this.image = image;
-			this.speedModifier = speedModifier;
-			this.speed = 0;
-		}
-		update() {
-			this.speed = gameSpeed * this.speedModifier;
-			this.x = (this.x - this.speed) % this.width; //loop the background
-		}
-		draw() {
-			ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-			ctx.drawImage(
-				this.image,
-				this.x + this.width,
-				this.y,
-				this.width,
-				this.height
-			);
-		}
-	}
-
-	const layer1 = new Layer(backGroundLayer1, 0.2);
-	const layer2 = new Layer(backGroundLayer2, 0.4);
-	const layer3 = new Layer(backGroundLayer3, 0.6);
-	const layer4 = new Layer(backGroundLayer4, 0.8);
-	const layer5 = new Layer(backGroundLayer5, 1);
-
-	const backgroundLayers = [layer1, layer2, layer3, layer4, layer5];
-
 	// Create Enemies
-	const enemyImg = new Image();
-	enemyImg.src = "./src/assets/enemy.png";
-	class Enemy {
-		constructor() {
-			this.enemyWidth = 136.5;
-			this.enemyHeight = 141;
-			this.speed = 2; // stop animation
-			this.width = this.enemyWidth;
-			this.height = this.enemyHeight;
-			this.x = Math.random() * (canvas.width - this.width);
-			this.y = Math.random() * (canvas.height - this.height);
-			this.angle = Math.random() * 5 * Math.PI;
-			this.angleSpeed = Math.random() * 0.1;
-
-			this.frame = 0;
-			this.flapSpeed = Math.floor(Math.random() * 5 + 1);
-		}
-		update() {
-			this.x -= this.speed;
-			this.y += Math.sin(this.angle) * 2;
-			this.angle += this.angleSpeed;
-
-			if (this.x < 0) this.x = canvas.width;
-			if (this.y < 0) this.y = canvas.height - this.height;
-
-			// Animate enemies
-			if (gameFrame % this.flapSpeed === 0) {
-				this.frame >= 12 ? (this.frame = 0) : this.frame++;
-			}
-		}
-		draw() {
-			ctx.drawImage(
-				enemyImg,
-				this.frame * this.enemyWidth,
-				0,
-				this.enemyWidth,
-				this.enemyHeight,
-				this.x,
-				this.y,
-				this.width,
-				this.height
-			);
+	const numberOfEnemies = 3;
+	const enemiesArray = [];
+	function createEnemies(numberOfEnemies) {
+		for (let i = 0; i < numberOfEnemies; i++) {
+			enemiesArray.push(new Enemy(CANVAS_WIDTH, CANVAS_HEIGHT));
 		}
 	}
-
-	for (let i = 0; i < numberOfEnemies; i++) {
-		enemiesArray.push(new Enemy());
-	}
+	createEnemies(numberOfEnemies);
 
 	// Create Monster
 	class Monster {
@@ -226,24 +160,26 @@ window.addEventListener("load", () => {
 
 		// Draw background layers
 		backgroundLayers.forEach((layer) => {
-			layer.update();
-			layer.draw();
+			layer.update(gameSpeed);
+			layer.draw(ctx);
 		});
 
+		// Update and Draw player
 		player.update(input.lastKey);
 		player.draw(ctx, deltaTime);
-
-		drawStatusText(ctx, input, player);
-
-		// Update and Draw enemies
-		enemiesArray.forEach((enemy) => {
-			enemy.update();
-			enemy.draw();
-		});
 
 		// Update and Draw monster
 		monster.update();
 		monster.draw();
+
+		// Update and Draw enemies
+		enemiesArray.forEach((enemy) => {
+			enemy.update(gameFrame);
+			enemy.draw(ctx);
+		});
+
+		// draw text
+		drawStatusText(ctx, input, player);
 
 		//animate explosion
 
