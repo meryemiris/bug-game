@@ -32,20 +32,20 @@ export default class Player {
 		this.height = this.spriteHeight;
 		this.x = this.gameWidth / 2 - this.width / 2;
 		this.y = this.gameHeight - this.height - 160;
-		this.vy = 0;
-		this.vx = 0;
-		this.weight = 1;
+		// this.velX = 0;
+		this.velY = 0;
+		this.gravity = 0.5;
 		this.frameX = 0;
 		this.frameY = 2;
-		this.maxFrame = 10;
+		this.maxFrame = 19;
 		this.speed = 0;
 		this.maxSpeed = 10;
 
-		this.fps = 60;
+		this.fps = 10;
 		this.frameInterval = 1000 / this.fps;
 		this.frameTimer = 0;
 	}
-	draw(context, deltaTime = 0) {
+	draw(context, deltaTime) {
 		if (this.frameTimer > this.frameInterval) {
 			if (this.frameX < this.maxFrame) this.frameX++;
 			else this.frameX = 0;
@@ -76,11 +76,12 @@ export default class Player {
 			this.x = this.gameWidth - this.width;
 
 		//vertical movement
-		this.y += this.vy;
+		this.y += this.velY;
 		if (!this.onGround()) {
-			this.vy += this.weight;
+			this.velY += this.gravity;
+			if (this.velY > this.maxSpeed) this.velY = this.maxSpeed;
 		} else {
-			this.vy = 0;
+			this.velY = 0;
 		}
 	}
 	setState(state) {

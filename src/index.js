@@ -174,7 +174,7 @@ window.addEventListener("load", () => {
 			this.sound.src = "./src/assets/boom.wav";
 		}
 		update() {
-			if (this.frame === 0) this.sound.play();
+			// if (this.frame === 0) this.sound.play();
 			this.timer++;
 			if (this.timer % 10 === 0) {
 				this.frame++;
