@@ -1,6 +1,6 @@
 import Player from "./components/player/player.js";
 import Layer from "./components/background/background.js";
-import Enemy from "./components/enemies/enemies.js";
+import Enemy from "./components/enemy/enemy.js";
 import InputHandler from "./components/player/input.js";
 import { drawStatusText } from "./components/player/utils.js";
 
