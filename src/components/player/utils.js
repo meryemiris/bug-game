@@ -1,5 +1,7 @@
-export function drawStatusText(context, input, player) {
-	context.font = "30px Arial";
-	context.fillText("last input: " + input.lastKey, 10, 50);
-	context.fillText("player: " + player.currentState.state, 10, 100);
+export function drawScore(context, score) {
+	context.font = "50px Impact";
+	context.fillStyle = "black";
+	context.fillText("Score: " + score, 50, 75);
+	context.fillStyle = "#eee";
+	context.fillText("Score: " + score, 52, 77);
 }
