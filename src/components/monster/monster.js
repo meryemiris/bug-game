@@ -4,20 +4,23 @@ export default class Monster {
 	constructor(gameWidth, gameHeight) {
 		this.gameWidth = gameWidth;
 		this.gameHeight = gameHeight;
+		this.groundHeight = this.gameHeight - 80;
+
 		this.image = new Image();
 		this.image.src = "./src/assets/monster.png";
 
-		this.speed = 0;
-		this.monsterWidth = 262;
-		this.monsterHeight = 242;
-		this.width = this.monsterWidth * 1.5;
-		this.height = this.monsterHeight * 1.5;
+		this.speed = 2;
+		this.spriteWidth = 262;
+		this.spriteHeight = 242;
+		this.width = this.spriteWidth * 1.5;
+		this.height = this.spriteHeight * 1.5;
 		this.x = this.gameWidth;
-		this.y = this.gameHeight - this.height - 100;
+		this.y = this.groundHeight - this.height;
 		this.frameX = 0;
-		this.frameY = this.monsterHeight * 2;
+		this.frameY = this.spriteHeight * 2;
 		this.maxFrame = 12;
 		this.walkSpeed = 10;
+		this.color = "red";
 	}
 	update(gameFrame) {
 		this.x -= this.speed;
@@ -27,13 +30,16 @@ export default class Monster {
 			this.frameX >= 12 ? (this.frameX = 0) : this.frameX++;
 		}
 	}
-	draw(context) {
+	draw(collisionCtx, context) {
+		collisionCtx.fillStyle = this.color;
+
+		collisionCtx.fillRect(this.x, this.y, this.width, this.height);
 		context.drawImage(
 			this.image,
-			this.frameX * this.monsterWidth,
+			this.frameX * this.spriteWidth,
 			this.frameY,
-			this.monsterWidth,
-			this.monsterHeight,
+			this.spriteWidth,
+			this.spriteHeight,
 			this.x,
 			this.y,
 			this.width,

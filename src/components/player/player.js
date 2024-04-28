@@ -13,6 +13,7 @@ export default class Player {
 	constructor(gameWidth, gameHeight) {
 		this.gameWidth = gameWidth;
 		this.gameHeight = gameHeight;
+		this.groundHeight = this.gameHeight - 130;
 		this.states = [
 			new StandingRight(this),
 			new StandingLeft(this),
@@ -28,10 +29,10 @@ export default class Player {
 		this.image.src = "./src/assets/player.png";
 		this.spriteWidth = 495;
 		this.spriteHeight = 330;
-		this.width = this.spriteWidth;
-		this.height = this.spriteHeight;
+		this.width = this.spriteWidth * 0.8;
+		this.height = this.spriteHeight * 0.8;
 		this.x = -this.gameWidth;
-		this.y = this.gameHeight - this.height - 160;
+		this.y = this.groundHeight - this.height;
 		// this.velX = 0;
 		this.velY = 0;
 		this.gravity = 0.5;
@@ -44,8 +45,10 @@ export default class Player {
 		this.fps = 10;
 		this.frameInterval = 1000 / this.fps;
 		this.frameTimer = 0;
+
+		this.color = "black";
 	}
-	draw(context, deltaTime) {
+	draw(collisionCtx, context, deltaTime) {
 		if (this.frameTimer > this.frameInterval) {
 			if (this.frameX < this.maxFrame) this.frameX++;
 			else this.frameX = 0;
@@ -54,12 +57,14 @@ export default class Player {
 			this.frameTimer += this.frameInterval;
 		}
 
+		collisionCtx.fillStyle = this.color;
+		collisionCtx.fillRect(this.x, this.y, this.width, this.height);
 		context.drawImage(
 			this.image,
-			this.width * this.frameX,
-			this.height * this.frameY,
-			this.width,
-			this.height,
+			this.spriteWidth * this.frameX,
+			this.spriteHeight * this.frameY,
+			this.spriteWidth,
+			this.spriteHeight,
 			this.x,
 			this.y,
 			this.width,
@@ -89,6 +94,6 @@ export default class Player {
 		this.currentState.enter();
 	}
 	onGround() {
-		return this.y >= this.gameHeight - this.height - 160;
+		return this.y >= this.groundHeight - this.height;
 	}
 }

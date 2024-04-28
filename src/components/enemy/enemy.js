@@ -5,7 +5,7 @@ export default class Enemy {
 		this.enemyWidth = 136.5;
 		this.enemyHeight = 141;
 		this.speed = 2;
-		this.sizeModifier = 1 + Math.random() * 0.5;
+		this.sizeModifier = 0.5 + Math.random() * 0.5;
 
 		this.width = this.enemyWidth * this.sizeModifier;
 		this.height = this.enemyHeight * this.sizeModifier;
@@ -17,6 +17,7 @@ export default class Enemy {
 		this.frame = 0;
 		this.flapSpeed = Math.floor(Math.random() * 5 + 1);
 
+		this.markedForDeletion = false;
 		this.randomColors = [
 			Math.floor(Math.random() * 255),
 			Math.floor(Math.random() * 255),
@@ -30,8 +31,6 @@ export default class Enemy {
 			"," +
 			this.randomColors[2] +
 			")";
-
-		console.log(this.color);
 	}
 	update(gameFrame) {
 		this.x -= this.speed;
@@ -48,6 +47,7 @@ export default class Enemy {
 	}
 	draw(collisionCtx, context) {
 		// Draw collision box
+
 		collisionCtx.fillStyle = this.color;
 		collisionCtx.fillRect(this.x, this.y, this.width, this.height, this.color);
 

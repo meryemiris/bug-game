@@ -5,13 +5,13 @@ import Monster from "./components/monster/monster.js";
 import Explosion from "./components/explosion/explosion.js";
 
 import InputHandler from "./components/player/input.js";
-import { drawStatusText } from "./components/player/utils.js";
+import { drawScore } from "./components/player/utils.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-const CANVAS_WIDTH = 1920;
-const CANVAS_HEIGHT = 1080;
+const CANVAS_WIDTH = innerWidth;
+const CANVAS_HEIGHT = innerHeight;
 
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
@@ -22,20 +22,51 @@ const collisionCtx = collisionCanvas.getContext("2d");
 collisionCanvas.width = CANVAS_WIDTH;
 collisionCanvas.height = CANVAS_HEIGHT;
 
-let gameSpeed = 10;
+let gameSpeed = 0;
 let gameFrame = 0;
 
 let lastTime = 0;
 
-const numberOfEnemies = 5;
+const numberOfEnemies = 12;
 let enemiesArray = [];
 
 let explosions = [];
+let score = 0;
+
+function createExplosion(e) {
+	const rect = canvas.getBoundingClientRect();
+	const scaleX = canvas.width / rect.width;
+	const scaleY = canvas.height / rect.height;
+
+	let positionX = (e.clientX - rect.left) * scaleX;
+	let positionY = (e.clientY - rect.top) * scaleY;
+
+	explosions.push(new Explosion(positionX, positionY));
+}
+
+window.addEventListener("click", (e) => {
+	const pixelColor = collisionCtx.getImageData(e.x, e.y, 1, 1, {
+		willReadFrequently: true,
+	}).data;
+
+	enemiesArray.forEach((enemy) => {
+		if (
+			enemy.randomColors[0] === pixelColor[0] &&
+			enemy.randomColors[1] === pixelColor[1] &&
+			enemy.randomColors[2] === pixelColor[2]
+		) {
+			enemy.markedForDeletion = true;
+			score++;
+			createExplosion(e);
+			enemiesArray = enemiesArray.filter((enemy) => !enemy.markedForDeletion);
+		}
+	});
+});
 
 window.addEventListener("load", () => {
 	// Create player
 	const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
-	player.draw(ctx);
+	player.draw(collisionCtx, ctx);
 
 	// Create input handler for player
 	const input = new InputHandler();
@@ -52,52 +83,37 @@ window.addEventListener("load", () => {
 	const backGroundLayer5 = new Image();
 	backGroundLayer5.src = "./src/assets/layer_05.png";
 
-	const layer1 = new Layer(backGroundLayer1, 0.2);
-	const layer2 = new Layer(backGroundLayer2, 0.4);
-	const layer3 = new Layer(backGroundLayer3, 0.6);
-	const layer4 = new Layer(backGroundLayer4, 0.8);
-	const layer5 = new Layer(backGroundLayer5, 1);
+	const layer1 = new Layer(backGroundLayer1, 0.2, CANVAS_WIDTH, CANVAS_HEIGHT);
+	const layer2 = new Layer(backGroundLayer2, 0.4, CANVAS_WIDTH, CANVAS_HEIGHT);
+	const layer3 = new Layer(backGroundLayer3, 0.6, CANVAS_WIDTH, CANVAS_HEIGHT);
+	const layer4 = new Layer(backGroundLayer4, 0.8, CANVAS_WIDTH, CANVAS_HEIGHT);
+	const layer5 = new Layer(backGroundLayer5, 1, CANVAS_WIDTH, CANVAS_HEIGHT);
 
 	const backgroundLayers = [layer1, layer2, layer3, layer4, layer5];
 
 	// Create Monster
 	const monster = new Monster(CANVAS_WIDTH, CANVAS_HEIGHT);
-	monster.draw(ctx);
+	monster.draw(collisionCtx, ctx);
 
 	// Create Enemies
 	function createEnemies(numberOfEnemies) {
 		for (let i = 0; i < numberOfEnemies; i++) {
 			enemiesArray.push(new Enemy(CANVAS_WIDTH, CANVAS_HEIGHT));
-			enemiesArray[i].draw(collisionCtx, ctx);
 		}
-		//put smaller enemies backword
-		enemiesArray.sort((a, b) => a.width - b.width); //sort as smaller are backward
+		enemiesArray.sort((a, b) => a.width - b.width);
+		enemiesArray.forEach((enemy) => {
+			enemy.draw(collisionCtx, ctx);
+		});
 	}
 	createEnemies(numberOfEnemies);
 
 	// create explosion
-
-	function createExplosion(e) {
-		const rect = canvas.getBoundingClientRect();
-		const scaleX = canvas.width / rect.width;
-		const scaleY = canvas.height / rect.height;
-
-		let positionX = (e.clientX - rect.left) * scaleX;
-		let positionY = (e.clientY - rect.top) * scaleY;
-
-		explosions.push(new Explosion(positionX, positionY));
-	}
-
-	window.addEventListener("click", (e) => {
-		createExplosion(e);
-	});
 
 	// Animation loop
 	function animate(timeStamp) {
 		const deltaTime = timeStamp - lastTime;
 		lastTime = timeStamp;
 		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-		collisionCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); // clear collision canvas
 
 		// Update Draw background layers
 		backgroundLayers.forEach((layer) => {
@@ -105,22 +121,24 @@ window.addEventListener("load", () => {
 			layer.draw(ctx);
 		});
 
+		collisionCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
 		// Update and Draw player
-		player.update(input.lastKey);
-		player.draw(ctx, deltaTime);
+		player.update(input.lastKey, deltaTime, gameSpeed);
+		player.draw(collisionCtx, ctx);
 
 		// Update and Draw monster
-		monster.update(gameFrame);
-		monster.draw(ctx);
+		monster.update(gameFrame, deltaTime);
+		monster.draw(collisionCtx, ctx);
 
 		// Update and Draw enemies
 		enemiesArray.forEach((enemy) => {
-			enemy.update(gameFrame);
+			enemy.update(gameFrame, deltaTime);
 			enemy.draw(collisionCtx, ctx);
 		});
 
 		// Draw text
-		drawStatusText(ctx, input, player);
+		drawScore(ctx, score);
 
 		// Animate explosion
 
