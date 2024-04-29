@@ -1,10 +1,10 @@
 export default class Explosion {
-	constructor(x, y) {
+	constructor(x, y, size) {
 		this.spriteWidth = 200;
 		this.spriteHeight = 179;
-		this.width = this.spriteWidth * 0.7;
-		this.height = this.spriteHeight * 0.7;
-		this.x = x - this.width / 2; // center the explosion on the point of impact
+		this.width = this.spriteWidth * size;
+		this.height = this.spriteHeight * size;
+		this.x = x - this.width / 2;
 		this.y = y - this.height / 2;
 		this.image = new Image();
 		this.image.src = "./src/assets/boom.png";
@@ -12,12 +12,17 @@ export default class Explosion {
 		this.frame = 0;
 		this.sound = new Audio();
 		this.sound.src = "./src/assets/boom.wav";
+
+		this.fps = 10;
+		this.timeSinceLastFrame = 0;
+		this.frameInterval = 1000 / this.fps;
 	}
-	update() {
+	update(deltaTime) {
 		if (this.frame === 0) this.sound.play();
-		this.timer++;
-		if (this.timer % 10 === 0) {
+		this.timeSinceLastFrame += deltaTime;
+		if (this.timeSinceLastFrame > this.frameInterval) {
 			this.frame++;
+			this.timeSinceLastFrame = 0;
 		}
 	}
 	draw(context) {
