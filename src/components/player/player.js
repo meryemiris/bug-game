@@ -33,7 +33,7 @@ export default class Player {
 		this.height = this.spriteHeight * 0.8;
 		this.x = -this.gameWidth;
 		this.y = this.groundHeight - this.height;
-		// this.velX = 0;
+
 		this.velY = 0;
 		this.gravity = 0.5;
 		this.frameX = 0;
@@ -42,21 +42,13 @@ export default class Player {
 		this.speed = 0;
 		this.maxSpeed = 10;
 
-		this.fps = 10;
+		this.fps = 20;
+		this.timeSinceLastFrame = 0;
 		this.frameInterval = 1000 / this.fps;
-		this.frameTimer = 0;
 
 		this.color = "black";
 	}
-	draw(collisionCtx, context, deltaTime) {
-		if (this.frameTimer > this.frameInterval) {
-			if (this.frameX < this.maxFrame) this.frameX++;
-			else this.frameX = 0;
-			this.frameTimer = 0;
-		} else {
-			this.frameTimer += this.frameInterval;
-		}
-
+	draw(collisionCtx, context) {
 		collisionCtx.fillStyle = this.color;
 		collisionCtx.fillRect(this.x, this.y, this.width, this.height);
 		context.drawImage(
@@ -71,7 +63,14 @@ export default class Player {
 			this.height
 		);
 	}
-	update(input) {
+	update(input, deltaTime) {
+		this.timeSinceLastFrame += deltaTime;
+		if (this.timeSinceLastFrame > this.frameInterval) {
+			this.frameX++;
+			this.timeSinceLastFrame = 0;
+		}
+		if (this.frameX > this.maxFrame) this.frameX = 0;
+
 		this.currentState.handleInput(input);
 
 		//horizontal movement
