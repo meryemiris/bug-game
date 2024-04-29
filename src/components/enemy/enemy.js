@@ -31,8 +31,10 @@ export default class Enemy {
 			"," +
 			this.randomColors[2] +
 			")";
+		this.timeSinceLastFrame = 0;
+		this.frameInterval = 200;
 	}
-	update(gameFrame) {
+	update(deltaTime) {
 		this.x -= this.speed;
 		this.y += Math.sin(this.angle) * 2;
 		this.angle += this.angleSpeed;
@@ -41,9 +43,12 @@ export default class Enemy {
 		if (this.y < 0) this.y = canvas.height - this.height;
 
 		// Animate enemies
-		if (gameFrame % this.flapSpeed === 0) {
-			this.frame >= 12 ? (this.frame = 0) : this.frame++;
+		this.timeSinceLastFrame += deltaTime;
+		if (this.timeSinceLastFrame > this.frameInterval) {
+			this.frame++;
+			this.timeSinceLastFrame = 0;
 		}
+		if (this.frame >= 12) this.frame = 0;
 	}
 	draw(collisionCtx, context) {
 		// Draw collision box
