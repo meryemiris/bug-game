@@ -23,26 +23,20 @@ collisionCanvas.width = CANVAS_WIDTH;
 collisionCanvas.height = CANVAS_HEIGHT;
 
 let gameSpeed = 0;
-let gameFrame = 0;
 
-let lastTime = 0;
-
-const numberOfEnemies = 12;
+const numberOfEnemies = 2;
 let enemiesArray = [];
 
 let explosions = [];
 let score = 0;
 
-function createExplosion(e) {
-	const rect = canvas.getBoundingClientRect();
-	const scaleX = canvas.width / rect.width;
-	const scaleY = canvas.height / rect.height;
-
-	let positionX = (e.clientX - rect.left) * scaleX;
-	let positionY = (e.clientY - rect.top) * scaleY;
-
-	explosions.push(new Explosion(positionX, positionY));
+function createEnemies(numberOfEnemies) {
+	for (let i = 0; i < numberOfEnemies; i++) {
+		enemiesArray.push(new Enemy(CANVAS_WIDTH, CANVAS_HEIGHT));
+	}
+	enemiesArray.sort((a, b) => a.width - b.width);
 }
+createEnemies(numberOfEnemies);
 
 window.addEventListener("click", (e) => {
 	const pixelColor = collisionCtx.getImageData(e.x, e.y, 1, 1, {
@@ -57,8 +51,14 @@ window.addEventListener("click", (e) => {
 		) {
 			enemy.markedForDeletion = true;
 			score++;
-			createExplosion(e);
+			explosions.push(new Explosion(enemy.x, enemy.y, enemy.sizeModifier));
+			if (explosions.length > 4) {
+				explosions.shift();
+			}
 			enemiesArray = enemiesArray.filter((enemy) => !enemy.markedForDeletion);
+			if (enemiesArray.length < 2) {
+				createEnemies(numberOfEnemies);
+			}
 		}
 	});
 });
@@ -93,29 +93,15 @@ window.addEventListener("load", () => {
 
 	// Create Monster
 	const monster = new Monster(CANVAS_WIDTH, CANVAS_HEIGHT);
-	monster.draw(collisionCtx, ctx);
 
 	// Create Enemies
-	function createEnemies(numberOfEnemies) {
-		for (let i = 0; i < numberOfEnemies; i++) {
-			enemiesArray.push(new Enemy(CANVAS_WIDTH, CANVAS_HEIGHT));
-		}
-		enemiesArray.sort((a, b) => a.width - b.width);
-		enemiesArray.forEach((enemy) => {
-			enemy.draw(collisionCtx, ctx);
-		});
-	}
-	createEnemies(numberOfEnemies);
 
-	// create explosion
-
-	// Animation loop
+	let lastTime = 0;
 	function animate(timeStamp) {
 		const deltaTime = timeStamp - lastTime;
 		lastTime = timeStamp;
 		ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-		// Update Draw background layers
 		backgroundLayers.forEach((layer) => {
 			layer.update(gameSpeed);
 			layer.draw(ctx);
@@ -123,34 +109,22 @@ window.addEventListener("load", () => {
 
 		collisionCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-		// Update and Draw player
-		player.update(input.lastKey, deltaTime, gameSpeed);
+		player.update(input.lastKey, deltaTime);
 		player.draw(collisionCtx, ctx);
 
-		// Update and Draw monster
-		monster.update(gameFrame, deltaTime);
-		monster.draw(collisionCtx, ctx);
-
-		// Update and Draw enemies
-		enemiesArray.forEach((enemy) => {
-			enemy.update(gameFrame, deltaTime);
-			enemy.draw(collisionCtx, ctx);
+		[...enemiesArray, monster].forEach((object) => {
+			object.update(deltaTime);
+			object.draw(collisionCtx, ctx);
 		});
 
-		// Draw text
 		drawScore(ctx, score);
 
 		// Animate explosion
 
-		for (let i = 0; i < explosions.length; i++) {
-			explosions[i].update();
-			explosions[i].draw(ctx);
-			if (explosions[i].frame > 5) {
-				explosions.splice(i, 1);
-				i--;
-			}
-		}
-		gameFrame++;
+		explosions.forEach((explosion) => {
+			explosion.update(deltaTime);
+			explosion.draw(ctx);
+		});
 
 		// Update game state
 		requestAnimationFrame(animate);
