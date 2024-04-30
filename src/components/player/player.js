@@ -47,10 +47,13 @@ export default class Player {
 		this.frameInterval = 1000 / this.fps;
 
 		this.color = "black";
+
+		this.lives = 7;
+		this.isDead = false;
 	}
 	draw(collisionCtx, context) {
 		collisionCtx.fillStyle = this.color;
-		collisionCtx.fillRect(this.x, this.y, this.width, this.height);
+		collisionCtx.strokeRect(this.x, this.y, this.width, this.height);
 		context.drawImage(
 			this.image,
 			this.spriteWidth * this.frameX,
@@ -94,5 +97,11 @@ export default class Player {
 	}
 	onGround() {
 		return this.y >= this.groundHeight - this.height;
+	}
+	decrementLives() {
+		this.lives--;
+		if (this.lives <= 0) {
+			this.isDead = true;
+		}
 	}
 }

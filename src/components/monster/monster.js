@@ -40,7 +40,7 @@ export default class Monster {
 	draw(collisionCtx, context) {
 		collisionCtx.fillStyle = this.color;
 
-		collisionCtx.fillRect(this.x, this.y, this.width, this.height);
+		collisionCtx.strokeRect(this.x, this.y, this.width, this.height);
 		context.drawImage(
 			this.image,
 			this.frameX * this.spriteWidth,

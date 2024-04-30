@@ -5,7 +5,7 @@ import Monster from "./components/monster/monster.js";
 import Explosion from "./components/explosion/explosion.js";
 
 import InputHandler from "./components/player/input.js";
-import { drawScore } from "./components/player/utils.js";
+import { drawScore, drawLives } from "./components/utils/indicators.js";
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -30,6 +30,8 @@ let enemiesArray = [];
 let explosions = [];
 let score = 0;
 
+let isGameOver = false;
+
 function createEnemies(numberOfEnemies) {
 	for (let i = 0; i < numberOfEnemies; i++) {
 		enemiesArray.push(new Enemy(CANVAS_WIDTH, CANVAS_HEIGHT));
@@ -49,24 +51,68 @@ window.addEventListener("click", (e) => {
 			enemy.randomColors[1] === pixelColor[1] &&
 			enemy.randomColors[2] === pixelColor[2]
 		) {
-			enemy.markedForDeletion = true;
 			score++;
-			explosions.push(new Explosion(enemy.x, enemy.y, enemy.sizeModifier));
-			if (explosions.length > 4) {
-				explosions.shift();
-			}
-			enemiesArray = enemiesArray.filter((enemy) => !enemy.markedForDeletion);
-			if (enemiesArray.length < 2) {
-				createEnemies(numberOfEnemies);
-			}
+			removeEnemy(enemy);
 		}
 	});
+	enemiesArray.length < numberOfEnemies ? createEnemies(numberOfEnemies) : null;
 });
+
+function removeEnemy(enemy) {
+	enemy.markedForDeletion = true;
+	enemiesArray = enemiesArray.filter((enemy) => !enemy.markedForDeletion);
+
+	explosions.push(new Explosion(enemy.x, enemy.y, enemy.sizeModifier));
+	if (explosions.length > 4) {
+		explosions.shift();
+	}
+}
 
 window.addEventListener("load", () => {
 	// Create player
 	const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
 	player.draw(collisionCtx, ctx);
+
+	function handlePlayerEnemyCollisions(player, enemiesArray) {
+		// if (!player || !enemiesArray || !enemiesArray.length) {
+		// 	console.error("Invalid player or enemies array.");
+		// 	return;
+		// }
+
+		for (let i = 0; i < enemiesArray.length; i++) {
+			const enemy = enemiesArray[i];
+
+			if (enemy.HasCollided) return;
+
+			if (detectCollision(player, enemy)) {
+				enemy.hasCollided = true;
+				score++;
+				removeEnemy(enemy);
+
+				player.decrementLives();
+				if (player.isDead) {
+					gameOver();
+				}
+			}
+		}
+	}
+
+	function detectCollision(player, enemy) {
+		return (
+			player.x < enemy.x + enemy.width &&
+			player.x + player.width > enemy.x &&
+			player.y < enemy.y + enemy.height &&
+			player.y + player.height > enemy.y
+		);
+	}
+
+	function gameOver() {
+		isGameOver = true;
+		setTimeout(() => {
+			alert("Game Over!");
+			location.reload();
+		}, 1000);
+	}
 
 	// Create input handler for player
 	const input = new InputHandler();
@@ -109,15 +155,18 @@ window.addEventListener("load", () => {
 
 		collisionCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-		player.update(input.lastKey, deltaTime);
-		player.draw(collisionCtx, ctx);
+		handlePlayerEnemyCollisions(player, enemiesArray);
 
-		[...enemiesArray, monster].forEach((object) => {
+		[monster, ...enemiesArray].forEach((object) => {
 			object.update(deltaTime);
 			object.draw(collisionCtx, ctx);
 		});
 
+		player.update(input.lastKey, deltaTime);
+		player.draw(collisionCtx, ctx);
+
 		drawScore(ctx, score);
+		drawLives(ctx, player.lives);
 
 		// Animate explosion
 
@@ -127,7 +176,8 @@ window.addEventListener("load", () => {
 		});
 
 		// Update game state
-		requestAnimationFrame(animate);
+
+		if (!isGameOver) requestAnimationFrame(animate);
 	}
 
 	animate(0);

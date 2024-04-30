@@ -33,6 +33,8 @@ export default class Enemy {
 			")";
 		this.timeSinceLastFrame = 0;
 		this.frameInterval = 200;
+
+		this.hasCollided = false;
 	}
 	update(deltaTime) {
 		this.x -= this.speed;
@@ -49,6 +51,8 @@ export default class Enemy {
 			this.timeSinceLastFrame = 0;
 		}
 		if (this.frame >= 12) this.frame = 0;
+
+		// Check for collision
 	}
 	draw(collisionCtx, context) {
 		// Draw collision box
