@@ -13,4 +13,20 @@ export function drawLives(context, lives) {
 	context.fillText("Lives: " + lives + "/7", context.canvas.width - 250, 75);
 	context.fillStyle = "#eee";
 	context.fillText("Lives: " + lives + "/7", context.canvas.width - 252, 77);
+
+	if (lives <= 0) {
+		context.font = "100px Impact";
+		context.fillStyle = "black";
+		context.fillText(
+			"GAME OVER",
+			context.canvas.width / 2 - 250,
+			context.canvas.height / 2
+		);
+		context.fillStyle = "#eee";
+		context.fillText(
+			"GAME OVER",
+			context.canvas.width / 2 - 252,
+			context.canvas.height / 2 + 3
+		);
+	}
 }

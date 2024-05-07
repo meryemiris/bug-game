@@ -24,7 +24,7 @@ collisionCanvas.height = CANVAS_HEIGHT;
 
 let gameSpeed = 0;
 
-const numberOfEnemies = 2;
+const numberOfEnemies = 0;
 let enemiesArray = [];
 
 let explosions = [];
@@ -41,6 +41,8 @@ function createEnemies(numberOfEnemies) {
 createEnemies(numberOfEnemies);
 
 window.addEventListener("click", (e) => {
+	if (isGameOver) return;
+
 	const pixelColor = collisionCtx.getImageData(e.x, e.y, 1, 1, {
 		willReadFrequently: true,
 	}).data;
@@ -55,7 +57,6 @@ window.addEventListener("click", (e) => {
 			removeEnemy(enemy);
 		}
 	});
-	enemiesArray.length < numberOfEnemies ? createEnemies(numberOfEnemies) : null;
 });
 
 function removeEnemy(enemy) {
@@ -66,6 +67,7 @@ function removeEnemy(enemy) {
 	if (explosions.length > 4) {
 		explosions.shift();
 	}
+	enemiesArray.length < numberOfEnemies ? createEnemies(1) : null;
 }
 
 window.addEventListener("load", () => {
@@ -74,30 +76,27 @@ window.addEventListener("load", () => {
 	player.draw(collisionCtx, ctx);
 
 	function handlePlayerEnemyCollisions(player, enemiesArray) {
-		// if (!player || !enemiesArray || !enemiesArray.length) {
-		// 	console.error("Invalid player or enemies array.");
-		// 	return;
-		// }
-
 		for (let i = 0; i < enemiesArray.length; i++) {
 			const enemy = enemiesArray[i];
 
-			if (enemy.HasCollided) return;
+			if (enemy.HasCollided || player.isDead) return;
 
-			if (detectCollision(player, enemy)) {
+			if (detectCollisionwithEnemy(player, enemy)) {
 				enemy.hasCollided = true;
 				score++;
 				removeEnemy(enemy);
 
-				player.decrementLives();
+				player.decrementLives(1);
 				if (player.isDead) {
-					gameOver();
+					setTimeout(() => {
+						gameOver();
+					}, 500);
 				}
 			}
 		}
 	}
 
-	function detectCollision(player, enemy) {
+	function detectCollisionwithEnemy(player, enemy) {
 		return (
 			player.x < enemy.x + enemy.width &&
 			player.x + player.width > enemy.x &&
@@ -109,9 +108,8 @@ window.addEventListener("load", () => {
 	function gameOver() {
 		isGameOver = true;
 		setTimeout(() => {
-			alert("Game Over!");
 			location.reload();
-		}, 1000);
+		}, 5000);
 	}
 
 	// Create input handler for player
@@ -162,7 +160,7 @@ window.addEventListener("load", () => {
 			object.draw(collisionCtx, ctx);
 		});
 
-		player.update(input.lastKey, deltaTime);
+		player.update(input.lastKey, deltaTime, monster, isGameOver);
 		player.draw(collisionCtx, ctx);
 
 		drawScore(ctx, score);
