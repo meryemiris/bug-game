@@ -7,6 +7,12 @@ import {
 	JumpingLeft,
 	FallingRight,
 	FallingLeft,
+	AttackRight,
+	AttackLeft,
+	GetHitRight,
+	GetHitLeft,
+	DeadRight,
+	DeadLeft,
 } from "./state.js";
 
 export default class Player {
@@ -23,6 +29,12 @@ export default class Player {
 			new JumpingLeft(this),
 			new FallingRight(this),
 			new FallingLeft(this),
+			new AttackRight(this),
+			new AttackLeft(this),
+			new GetHitRight(this),
+			new GetHitLeft(this),
+			new DeadRight(this),
+			new DeadLeft(this),
 		];
 		this.currentState = this.states[0];
 		this.image = new Image();
@@ -66,13 +78,21 @@ export default class Player {
 			this.height
 		);
 	}
-	update(input, deltaTime) {
+	update(input, deltaTime, monster) {
 		this.timeSinceLastFrame += deltaTime;
 		if (this.timeSinceLastFrame > this.frameInterval) {
 			this.frameX++;
 			this.timeSinceLastFrame = 0;
 		}
 		if (this.frameX > this.maxFrame) this.frameX = 0;
+
+		if (this.isDead) {
+			if (this.speed >= 0) {
+				this.setState(12);
+			} else {
+				this.setState(13);
+			}
+		}
 
 		this.currentState.handleInput(input);
 
@@ -81,6 +101,17 @@ export default class Player {
 		if (this.x <= 0) this.x = 0;
 		else if (this.x >= this.gameWidth - this.width)
 			this.x = this.gameWidth - this.width;
+
+		// stop horizontal movement when hit the monster
+		if (
+			this.onGround() &&
+			this.x + this.width >= monster.x &&
+			this.x <= monster.x + monster.width
+		) {
+			this.speed = 0;
+		}
+
+		// dead
 
 		//vertical movement
 		this.y += this.velY;
@@ -98,8 +129,13 @@ export default class Player {
 	onGround() {
 		return this.y >= this.groundHeight - this.height;
 	}
-	decrementLives() {
-		this.lives--;
+	decrementLives(num) {
+		this.lives -= num;
+
+		if (this.speed >= 0) {
+			this.setState(10);
+		} else this.setState(11);
+
 		if (this.lives <= 0) {
 			this.isDead = true;
 		}
