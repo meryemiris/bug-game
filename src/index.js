@@ -1,7 +1,6 @@
 import Player from "./components/player/player.js";
 import Layer from "./components/background/background.js";
 import Enemy from "./components/enemy/enemy.js";
-import Monster from "./components/monster/monster.js";
 import Explosion from "./components/explosion/explosion.js";
 
 import InputHandler from "./components/player/input.js";
@@ -22,9 +21,9 @@ const collisionCtx = collisionCanvas.getContext("2d");
 collisionCanvas.width = CANVAS_WIDTH;
 collisionCanvas.height = CANVAS_HEIGHT;
 
-let gameSpeed = 0;
+let gameSpeed = 2;
 
-const numberOfEnemies = 0;
+const numberOfEnemies = 5;
 let enemiesArray = [];
 
 let explosions = [];
@@ -75,7 +74,7 @@ window.addEventListener("load", () => {
 	const player = new Player(CANVAS_WIDTH, CANVAS_HEIGHT);
 	player.draw(collisionCtx, ctx);
 
-	function handlePlayerEnemyCollisions(player, enemiesArray) {
+	function handleCollisions(player, enemiesArray, monster) {
 		for (let i = 0; i < enemiesArray.length; i++) {
 			const enemy = enemiesArray[i];
 
@@ -87,12 +86,13 @@ window.addEventListener("load", () => {
 				removeEnemy(enemy);
 
 				player.decrementLives(1);
-				if (player.isDead) {
-					setTimeout(() => {
-						gameOver();
-					}, 500);
-				}
 			}
+		}
+
+		if (player.isDead) {
+			setTimeout(() => {
+				gameOver();
+			}, 500);
 		}
 	}
 
@@ -135,9 +135,6 @@ window.addEventListener("load", () => {
 
 	const backgroundLayers = [layer1, layer2, layer3, layer4, layer5];
 
-	// Create Monster
-	const monster = new Monster(CANVAS_WIDTH, CANVAS_HEIGHT);
-
 	// Create Enemies
 
 	let lastTime = 0;
@@ -153,14 +150,14 @@ window.addEventListener("load", () => {
 
 		collisionCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-		handlePlayerEnemyCollisions(player, enemiesArray);
+		handleCollisions(player, enemiesArray);
 
-		[monster, ...enemiesArray].forEach((object) => {
+		[...enemiesArray].forEach((object) => {
 			object.update(deltaTime);
 			object.draw(collisionCtx, ctx);
 		});
 
-		player.update(input.lastKey, deltaTime, monster, isGameOver);
+		player.update(input.lastKey, deltaTime, isGameOver);
 		player.draw(collisionCtx, ctx);
 
 		drawScore(ctx, score);

@@ -37,6 +37,7 @@ export default class Player {
 			new DeadLeft(this),
 		];
 		this.currentState = this.states[0];
+
 		this.image = new Image();
 		this.image.src = "./src/assets/player.png";
 		this.spriteWidth = 495;
